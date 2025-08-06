@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>算术练习应用</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    
+    <!-- 配置Tailwind自定义颜色和字体 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4F46E5',
+                        secondary: '#10B981',
+                        accent: '#F59E0B',
+                        danger: '#EF4444',
+                        light: '#F3F4F6',
+                        dark: '#1F2937'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .card-shadow {
+                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            }
+            .transition-custom {
+                transition: all 0.2s ease;
+            }
+            .key-press {
+                transform: scale(0.95);
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-indigo-50 to-blue-50 min-h-screen font-sans text-dark flex flex-col items-center justify-center p-4">
+    <div class="max-w-md w-full bg-white rounded-2xl card-shadow overflow-hidden">
+        <!-- 应用标题 -->
+        <div class="bg-primary text-white p-6 text-center">
+            <h1 class="text-[clamp(1.5rem,3vw,2rem)] font-bold">算术练习应用</h1>
+            <p class="opacity-90 mt-1">提升你的计算能力</p>
+        </div>
+        
+        <!-- 设置界面 -->
+        <div id="settings-screen" class="p-6">
+            <div class="mb-6">
+                <label for="max-number" class="block text-sm font-medium text-gray-700 mb-1">数字范围</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                        <i class="fa fa-calculator"></i>
+                    </span>
+                    <input type="number" id="max-number" 
+                           class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-custom"
+                           min="1" value="10" placeholder="例如：10表示10以内">
+                </div>
+                <p class="text-xs text-gray-500 mt-1">输入数字表示进行多少以内的加减法</p>
+            </div>
+            
+            <div class="mb-8">
+                <label for="question-count" class="block text-sm font-medium text-gray-700 mb-1">题目数量</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                        <i class="fa fa-list-ol"></i>
+                    </span>
+                    <input type="number" id="question-count" 
+                           class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-custom"
+                           min="1" value="5" placeholder="输入题目数量">
+                </div>
+            </div>
+            
+            <button id="start-btn" class="w-full bg-primary hover:bg-primary/90 text-white font-medium py-3 px-4 rounded-lg transition-custom flex items-center justify-center">
+                <span>开始练习</span>
+                <i class="fa fa-arrow-right ml-2"></i>
+            </button>
+        </div>
+        
+        <!-- 答题界面 -->
+        <div id="quiz-screen" class="p-6 hidden">
+            <div class="flex justify-between items-center mb-6">
+                <div class="text-sm text-gray-500">
+                    <span id="current-question">第 1 题</span>
+                    <span id="total-questions">/ 5 题</span>
+                </div>
+                <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                    <i class="fa fa-clock-o text-xl"></i>
+                </div>
+            </div>
+            
+            <div class="bg-light rounded-xl p-6 mb-6 min-h-[120px] flex items-center justify-center">
+                <h2 id="question-text" class="text-[clamp(1.5rem,5vw,2.5rem)] font-bold text-center">
+                    5 + 3 = ?
+                </h2>
+            </div>
+            
+            <div class="mb-4">
+                <label for="answer-input" class="block text-sm font-medium text-gray-700 mb-1">你的答案</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                        <i class="fa fa-pencil"></i>
+                    </span>
+                    <input type="number" id="answer-input" 
+                           class="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-custom text-lg text-center"
+                           placeholder="点击数字输入答案" readonly>
+                </div>
+                <div id="feedback" class="mt-2 text-sm hidden"></div>
+            </div>
+            
+            <!-- 数字输入键盘 -->
+            <div class="grid grid-cols-3 gap-2 mb-4">
+                <button class="number-btn bg-light hover:bg-gray-200 text-dark text-xl py-3 rounded-lg transition-custom" data-number="1">1</button>
+                <button class="number-btn bg-light hover:bg-gray-200 text-dark text-xl py-3 rounded-lg transition-custom" data-number="2">2</button>
+                <button class="number-btn bg-light hover:bg-gray-200 text-dark text-xl py-3 rounded-lg transition-custom" data-number="3">3</button>
+                <button class="number-btn bg-light hover:bg-gray-200 text-dark text-xl py-3 rounded-lg transition-custom" data-number="4">4</button>
+                <button class="number-btn bg-light hover:bg-gray-200 text-dark text-xl py-3 rounded-lg transition-custom" data-number="5">5</button>
+                <button class="number-btn bg-light hover:bg-gray-200 text-dark text-xl py-3 rounded-lg transition-custom" data-number="6">6</button>
+                <button class="number-btn bg-light hover:bg-gray-200 text-dark text-xl py-3 rounded-lg transition-custom" data-number="7">7</button>
+                <button class="number-btn bg-light hover:bg-gray-200 text-dark text-xl py-3 rounded-lg transition-custom" data-number="8">8</button>
+                <button class="number-btn bg-light hover:bg-gray-200 text-dark text-xl py-3 rounded-lg transition-custom" data-number="9">9</button>
+                <button class="number-btn bg-gray-200 hover:bg-gray-300 text-dark text-xl py-3 rounded-lg transition-custom" data-number="clear">
+                    <i class="fa fa-backspace"></i>
+                </button>
+                <button class="number-btn bg-light hover:bg-gray-200 text-dark text-xl py-3 rounded-lg transition-custom" data-number="0">0</button>
+                <button class="number-btn bg-accent hover:bg-accent/90 text-white text-xl py-3 rounded-lg transition-custom" data-number="submit">
+                    <i class="fa fa-check"></i>
+                </button>
+            </div>
+            
+            <button id="submit-btn" class="w-full bg-secondary hover:bg-secondary/90 text-white font-medium py-3 px-4 rounded-lg transition-custom">
+                提交答案
+            </button>
+        </div>
+        
+        <!-- 完成界面 -->
+        <div id="complete-screen" class="p-6 hidden text-center">
+            <div class="w-20 h-20 bg-secondary/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i class="fa fa-trophy text-4xl text-secondary"></i>
+            </div>
+            
+            <h2 class="text-2xl font-bold mb-2">恭喜完成！</h2>
+            <p class="text-gray-600 mb-6">你已经完成了所有算术练习</p>
+            
+            <div class="bg-light rounded-xl p-4 mb-6">
+                <p class="text-gray-700"><span class="font-medium">总题目数：</span><span id="final-total">5</span> 题</p>
+                <p class="text-gray-700"><span class="font-medium">总尝试次数：</span><span id="final-attempts">5</span> 次</p>
+            </div>
+            
+            <button id="restart-btn" class="w-full bg-primary hover:bg-primary/90 text-white font-medium py-3 px-4 rounded-lg transition-custom">
+                再来一次
+            </button>
+        </div>
+    </div>
+    
+    <footer class="mt-8 text-center text-gray-500 text-sm">
+        <p>算术练习应用 &copy; 2023</p>
+    </footer>
+
+    <script>
+        // 全局变量
+        let maxNumber;
+        let questionCount;
+        let currentQuestion = 0;
+        let totalAttempts = 0;
+        let currentAnswer;
+        
+        // DOM 元素
+        const settingsScreen = document.getElementById('settings-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const completeScreen = document.getElementById('complete-screen');
+        const startBtn = document.getElementById('start-btn');
+        const submitBtn = document.getElementById('submit-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const maxNumberInput = document.getElementById('max-number');
+        const questionCountInput = document.getElementById('question-count');
+        const questionText = document.getElementById('question-text');
+        const answerInput = document.getElementById('answer-input');
+        const feedback = document.getElementById('feedback');
+        const currentQuestionEl = document.getElementById('current-question');
+        const totalQuestionsEl = document.getElementById('total-questions');
+        const finalTotalEl = document.getElementById('final-total');
+        const finalAttemptsEl = document.getElementById('final-attempts');
+        const numberButtons = document.querySelectorAll('.number-btn');
+        
+        // 语音合成函数
+        function speak(text) {
+            // 停止任何正在进行的语音
+            window.speechSynthesis.cancel();
+            
+            // 创建语音实例
+            const utterance = new SpeechSynthesisUtterance(text);
+            // 设置语言为中文
+            utterance.lang = 'zh-CN';
+            // 设置音量、语速和音调
+            utterance.volume = 1;
+            utterance.rate = 1;
+            utterance.pitch = 1;
+            
+            // 播放语音
+            window.speechSynthesis.speak(utterance);
+        }
+        
+        // 生成符合条件的题目
+        function generateQuestion() {
+            while (true) {
+                // 生成1到maxNumber之间的随机数（确保不为0）
+                const num1 = Math.floor(Math.random() * maxNumber) + 1;
+                const num2 = Math.floor(Math.random() * maxNumber) + 1;
+                
+                // 随机选择加法或减法
+                if (Math.random() > 0.5) {
+                    // 加法
+                    const answer = num1 + num2;
+                    // 确保结果不为0（对于加法来说，两个正数相加结果必然大于0）
+                    return {
+                        question: `${num1} + ${num2} = ?`,
+                        answer: answer
+                    };
+                } else {
+                    // 减法，确保结果为正且不为0
+                    if (num1 > num2) {
+                        const answer = num1 - num2;
+                        if (answer !== 0) {
+                            return {
+                                question: `${num1} - ${num2} = ?`,
+                                answer: answer
+                            };
+                        }
+                    }
+                }
+                // 如果不符合条件，循环将重新生成题目
+            }
+        }
+        
+        // 显示下一题
+        function showNextQuestion() {
+            currentQuestion++;
+            
+            // 检查是否完成所有题目
+            if (currentQuestion > questionCount) {
+                showCompleteScreen();
+                return;
+            }
+            
+            // 更新题目计数显示
+            currentQuestionEl.textContent = `第 ${currentQuestion} 题`;
+            
+            // 生成并显示新题目
+            const question = generateQuestion();
+            questionText.textContent = question.question;
+            currentAnswer = question.answer;
+            
+            // 重置输入和反馈
+            answerInput.value = '';
+            feedback.textContent = '';
+            feedback.classList.add('hidden');
+        }
+        
+        // 显示设置界面
+        function showSettingsScreen() {
+            settingsScreen.classList.remove('hidden');
+            quizScreen.classList.add('hidden');
+            completeScreen.classList.add('hidden');
+        }
+        
+        // 显示答题界面
+        function showQuizScreen() {
+            settingsScreen.classList.add('hidden');
+            quizScreen.classList.remove('hidden');
+            completeScreen.classList.add('hidden');
+            
+            // 初始化答题状态
+            currentQuestion = 0;
+            totalAttempts = 0;
+            totalQuestionsEl.textContent = `/ ${questionCount} 题`;
+            
+            // 显示第一题
+            showNextQuestion();
+        }
+        
+        // 显示完成界面
+        function showCompleteScreen() {
+            settingsScreen.classList.add('hidden');
+            quizScreen.classList.add('hidden');
+            completeScreen.classList.remove('hidden');
+            
+            // 更新完成统计
+            finalTotalEl.textContent = questionCount;
+            finalAttemptsEl.textContent = totalAttempts;
+            
+            // 语音提示完成
+            speak('恭喜你完成了所有题目！');
+        }
+        
+        // 验证用户输入
+        function validateInputs() {
+            const maxNum = parseInt(maxNumberInput.value);
+            const qCount = parseInt(questionCountInput.value);
+            
+            if (isNaN(maxNum) || maxNum < 1) {
+                showFeedback('请输入有效的数字范围（至少为1）', 'danger');
+                return false;
+            }
+            
+            if (isNaN(qCount) || qCount < 1) {
+                showFeedback('请输入有效的题目数量（至少为1）', 'danger');
+                return false;
+            }
+            
+            maxNumber = maxNum;
+            questionCount = qCount;
+            return true;
+        }
+        
+        // 显示反馈信息
+        function showFeedback(message, type) {
+            feedback.textContent = message;
+            feedback.classList.remove('hidden', 'text-green-600', 'text-red-600');
+            
+            if (type === 'success') {
+                feedback.classList.add('text-green-600');
+            } else {
+                feedback.classList.add('text-red-600');
+            }
+        }
+        
+        // 处理数字按钮点击
+        function handleNumberButtonClick(e) {
+            const action = e.target.closest('.number-btn').dataset.number;
+            const currentValue = answerInput.value;
+            
+            // 添加按钮按下效果
+            const button = e.target.closest('.number-btn');
+            button.classList.add('key-press');
+            setTimeout(() => button.classList.remove('key-press'), 150);
+            
+            if (action === 'clear') {
+                // 清除输入
+                answerInput.value = currentValue.slice(0, -1);
+            } else if (action === 'submit') {
+                // 提交答案
+                checkAnswer();
+            } else {
+                // 输入数字
+                answerInput.value = currentValue + action;
+            }
+        }
+        
+        // 检查答案
+        function checkAnswer() {
+            const userAnswer = parseInt(answerInput.value);
+            totalAttempts++;
+            
+            if (isNaN(userAnswer) || answerInput.value === '') {
+                showFeedback('请输入有效的数字作为答案', 'danger');
+                speak('输入无效，请输入一个整数作为答案。');
+                return;
+            }
+            
+            if (userAnswer === currentAnswer) {
+                showFeedback('回答正确！', 'success');
+                speak('回答正确！');
+                
+                // 延迟显示下一题
+                setTimeout(showNextQuestion, 1000);
+            } else {
+                showFeedback('回答错误，请重新计算！', 'danger');
+                speak('回答错误，请重新计算。');
+            }
+        }
+        
+        // 事件监听器
+        startBtn.addEventListener('click', () => {
+            if (validateInputs()) {
+                showQuizScreen();
+                speak(`好的，现在开始${maxNumber}以内的算术练习，一共${questionCount}道题。`);
+            }
+        });
+        
+        submitBtn.addEventListener('click', checkAnswer);
+        
+        restartBtn.addEventListener('click', () => {
+            showSettingsScreen();
+        });
+        
+        // 为所有数字按钮添加点击事件
+        numberButtons.forEach(button => {
+            button.addEventListener('click', handleNumberButtonClick);
+        });
+        
+        // 初始化页面
+        showSettingsScreen();
+    </script>
+</body>
+</html>
