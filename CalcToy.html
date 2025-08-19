@@ -217,6 +217,7 @@
         let correctAnswers = 0;
         let wrongAnswers = 0;
         let currentAnswer;
+        let currentQuestionAnswered = false;
         
         // DOM 元素
         const settingsScreen = document.getElementById('settings-screen');
@@ -376,6 +377,8 @@
             answerInput.value = '';
             feedback.textContent = '';
             feedback.classList.add('hidden');
+            // 标记当前题目未被正确回答
+            currentQuestionAnswered = false;
         }
         
         // 显示设置界面
@@ -507,14 +510,22 @@
             }
             
             if (userAnswer === currentAnswer) {
-                correctAnswers++;
+                // 只有当题目未被正确回答过时才增加答对计数
+                if (!currentQuestionAnswered) {
+                    correctAnswers++;
+                    currentQuestionAnswered = true;
+                }
                 showFeedback('回答正确！', 'success');
                 speak('回答正确！');
                 
                 // 延迟显示下一题
                 setTimeout(showNextQuestion, 1000);
             } else {
-                wrongAnswers++;
+                // 只有当题目未被正确回答过时才增加答错计数
+                if (!currentQuestionAnswered) {
+                    wrongAnswers++;
+                }
+                currentQuestionAnswered = true;
                 showFeedback('回答错误，请重新计算！', 'danger');
                 speak('回答错误，请重新计算。');
             }
