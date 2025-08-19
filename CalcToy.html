@@ -55,8 +55,32 @@
         
         <!-- 设置界面 -->
         <div id="settings-screen" class="p-6">
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div>
+                    <label for="min-number1" class="block text-sm font-medium text-gray-700 mb-1">数字1最小值</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                            <i class="fa fa-minus-circle"></i>
+                        </span>
+                        <input type="number" id="min-number1" 
+                               class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-custom"
+                               min="0" value="5" placeholder="第一个数的最小值">
+                    </div>
+                </div>
+                <div>
+                    <label for="min-number2" class="block text-sm font-medium text-gray-700 mb-1">数字2最小值</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                            <i class="fa fa-minus-circle"></i>
+                        </span>
+                        <input type="number" id="min-number2" 
+                               class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-custom"
+                               min="0" value="5" placeholder="第二个数的最小值">
+                    </div>
+                </div>
+            </div>
             <div class="mb-6">
-                <label for="max-number" class="block text-sm font-medium text-gray-700 mb-1">数字范围</label>
+                <label for="max-number" class="block text-sm font-medium text-gray-700 mb-1">数字范围最大值</label>
                 <div class="relative">
                     <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
                         <i class="fa fa-calculator"></i>
@@ -154,6 +178,8 @@
             <div class="bg-light rounded-xl p-4 mb-6">
                 <p class="text-gray-700"><span class="font-medium">总题目数：</span><span id="final-total">5</span> 题</p>
                 <p class="text-gray-700"><span class="font-medium">总尝试次数：</span><span id="final-attempts">5</span> 次</p>
+                <p class="text-gray-700"><span class="font-medium">答对题目：</span><span id="final-correct" class="text-green-600">0</span> 题</p>
+                <p class="text-gray-700"><span class="font-medium">答错题目：</span><span id="final-wrong" class="text-red-600">0</span> 题</p>
             </div>
             
             <button id="restart-btn" class="w-full bg-primary hover:bg-primary/90 text-white font-medium py-3 px-4 rounded-lg transition-custom">
@@ -163,15 +189,19 @@
     </div>
     
     <footer class="mt-8 text-center text-gray-500 text-sm">
-        <p>算术练习应用 &copy; 2023</p>
+        <p>算术练习应用 V1.1 &copy; by AI Trae</p>
     </footer>
 
     <script>
         // 全局变量
+        let minNumber1;
+        let minNumber2;
         let maxNumber;
         let questionCount;
         let currentQuestion = 0;
         let totalAttempts = 0;
+        let correctAnswers = 0;
+        let wrongAnswers = 0;
         let currentAnswer;
         
         // DOM 元素
@@ -190,6 +220,8 @@
         const totalQuestionsEl = document.getElementById('total-questions');
         const finalTotalEl = document.getElementById('final-total');
         const finalAttemptsEl = document.getElementById('final-attempts');
+        const finalCorrectEl = document.getElementById('final-correct');
+        const finalWrongEl = document.getElementById('final-wrong');
         const numberButtons = document.querySelectorAll('.number-btn');
         
         // 语音合成函数
@@ -213,15 +245,15 @@
         // 生成符合条件的题目
         function generateQuestion() {
             while (true) {
-                // 生成1到maxNumber之间的随机数（确保不为0）
-                const num1 = Math.floor(Math.random() * maxNumber) + 1;
-                const num2 = Math.floor(Math.random() * maxNumber) + 1;
-                
+                // 生成minNumber1到maxNumber之间的随机数
+                const num1 = Math.floor(Math.random() * (maxNumber - minNumber1 + 1)) + minNumber1;
+                // 生成minNumber2到maxNumber之间的随机数
+                const num2 = Math.floor(Math.random() * (maxNumber - minNumber2 + 1)) + minNumber2;
+
                 // 随机选择加法或减法
                 if (Math.random() > 0.5) {
                     // 加法
                     const answer = num1 + num2;
-                    // 确保结果不为0（对于加法来说，两个正数相加结果必然大于0）
                     return {
                         question: `${num1} + ${num2} = ?`,
                         answer: answer
@@ -282,6 +314,8 @@
             // 初始化答题状态
             currentQuestion = 0;
             totalAttempts = 0;
+            correctAnswers = 0;
+            wrongAnswers = 0;
             totalQuestionsEl.textContent = `/ ${questionCount} 题`;
             
             // 显示第一题
@@ -297,26 +331,47 @@
             // 更新完成统计
             finalTotalEl.textContent = questionCount;
             finalAttemptsEl.textContent = totalAttempts;
+            finalCorrectEl.textContent = correctAnswers;
+            finalWrongEl.textContent = wrongAnswers;
             
             // 语音提示完成
-            speak('恭喜你完成了所有题目！');
+            speak(`恭喜你完成了所有题目！你答对了${correctAnswers}道题，答错了${wrongAnswers}道题。`);
         }
         
         // 验证用户输入
         function validateInputs() {
+            const minNum1 = parseInt(document.getElementById('min-number1').value);
+            const minNum2 = parseInt(document.getElementById('min-number2').value);
             const maxNum = parseInt(maxNumberInput.value);
             const qCount = parseInt(questionCountInput.value);
-            
-            if (isNaN(maxNum) || maxNum < 1) {
-                showFeedback('请输入有效的数字范围（至少为1）', 'danger');
+
+            if (isNaN(minNum1) || minNum1 < 0) {
+                showFeedback('请输入有效的数字1最小值（非负数）', 'danger');
                 return false;
             }
-            
+
+            if (isNaN(minNum2) || minNum2 < 0) {
+                showFeedback('请输入有效的数字2最小值（非负数）', 'danger');
+                return false;
+            }
+
+            if (isNaN(maxNum) || maxNum < 1) {
+                showFeedback('请输入有效的数字范围最大值（至少为1）', 'danger');
+                return false;
+            }
+
+            if (minNum1 > maxNum || minNum2 > maxNum) {
+                showFeedback('最小值不能大于最大值', 'danger');
+                return false;
+            }
+
             if (isNaN(qCount) || qCount < 1) {
                 showFeedback('请输入有效的题目数量（至少为1）', 'danger');
                 return false;
             }
-            
+
+            minNumber1 = minNum1;
+            minNumber2 = minNum2;
             maxNumber = maxNum;
             questionCount = qCount;
             return true;
@@ -368,12 +423,14 @@
             }
             
             if (userAnswer === currentAnswer) {
+                correctAnswers++;
                 showFeedback('回答正确！', 'success');
                 speak('回答正确！');
                 
                 // 延迟显示下一题
                 setTimeout(showNextQuestion, 1000);
             } else {
+                wrongAnswers++;
                 showFeedback('回答错误，请重新计算！', 'danger');
                 speak('回答错误，请重新计算。');
             }
@@ -383,7 +440,7 @@
         startBtn.addEventListener('click', () => {
             if (validateInputs()) {
                 showQuizScreen();
-                speak(`好的，现在开始${maxNumber}以内的算术练习，一共${questionCount}道题。`);
+                speak(`好的，现在开始数字1不小于${minNumber1}、数字2不小于${minNumber2}、最大值为${maxNumber}的算术练习，一共${questionCount}道题。`);
             }
         });
         
