@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python关键字学习</title>
+    <style>
+        /* 基础样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #4CAF50;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        
+        h2 {
+            color: #333;
+            margin: 20px 0 15px;
+            font-size: 1.8em;
+        }
+        
+        /* 导航栏样式 */
+        .nav {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+        }
+        
+        .nav button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s;
+        }
+        
+        .nav button:hover {
+            background-color: #45a049;
+        }
+        
+        /* 功能区域样式 */
+        .section {
+            display: none;
+        }
+        
+        .section.active {
+            display: block;
+        }
+        
+        /* 关键字卡片样式 */
+        .keyword-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .keyword-card {
+            background-color: #e8f5e9;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .keyword-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .keyword-card h3 {
+            color: #2e7d32;
+            margin-bottom: 10px;
+            font-size: 1.5em;
+        }
+        
+        .keyword-card .meaning {
+            font-size: 1em;
+            color: #555;
+        }
+        
+        /* 选择题样式 */
+        .quiz-container {
+            background-color: #e3f2fd;
+            padding: 30px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        .question {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .option {
+            padding: 15px;
+            background-color: white;
+            border: 2px solid #bbdefb;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1.1em;
+        }
+        
+        .option:hover {
+            background-color: #f5f5f5;
+            border-color: #64b5f6;
+        }
+        
+        .option.correct {
+            background-color: #c8e6c9;
+            border-color: #4caf50;
+        }
+        
+        .option.incorrect {
+            background-color: #ffcdd2;
+            border-color: #f44336;
+        }
+        
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            font-size: 1.2em;
+            text-align: center;
+        }
+        
+        .feedback.correct {
+            background-color: #c8e6c9;
+            color: #2e7d32;
+        }
+        
+        .feedback.incorrect {
+            background-color: #ffcdd2;
+            color: #c62828;
+        }
+        
+        .next-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #2196f3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            transition: background-color 0.3s;
+        }
+        
+        .next-btn:hover {
+            background-color: #1976d2;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 600px) {
+            .container {
+                margin: 10px;
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            h2 {
+                font-size: 1.5em;
+            }
+            
+            .nav {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .nav button {
+                width: 100%;
+            }
+            
+            .keyword-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Python关键字学习</h1>
+        
+        <!-- 导航栏 -->
+        <div class="nav">
+            <button onclick="showSection('keywords')">关键字展示</button>
+            <button onclick="showSection('quiz1')">关键字选择</button>
+            <button onclick="showSection('quiz2')">含义选择</button>
+        </div>
+        
+        <!-- 关键字展示区域 -->
+        <div id="keywords" class="section active">
+            <h2>Python关键字及其含义</h2>
+            <div class="keyword-cards" id="keywordCards">
+                <!-- 关键字卡片将通过JavaScript生成 -->
+            </div>
+        </div>
+        
+        <!-- 关键字选择题区域 -->
+        <div id="quiz1" class="section">
+            <h2>关键字选择题</h2>
+            <div class="quiz-container">
+                <div class="question" id="question1"></div>
+                <div class="options" id="options1">
+                    <!-- 选项将通过JavaScript生成 -->
+                </div>
+                <div class="feedback" id="feedback1"></div>
+                <button class="next-btn" onclick="nextQuestion1()" style="display: none;">下一题</button>
+            </div>
+        </div>
+        
+        <!-- 含义选择题区域 -->
+        <div id="quiz2" class="section">
+            <h2>含义选择题</h2>
+            <div class="quiz-container">
+                <div class="question" id="question2"></div>
+                <div class="options" id="options2">
+                    <!-- 选项将通过JavaScript生成 -->
+                </div>
+                <div class="feedback" id="feedback2"></div>
+                <button class="next-btn" onclick="nextQuestion2()" style="display: none;">下一题</button>
+            </div>
+        </div>
+    </div>
+    
+    <footer style="text-align: center; margin-top: 30px; padding: 20px; background-color: #f0f0f0; border-radius: 5px;">
+        <p>Created by 哥本哈士奇 with TRAE CN</p>
+    </footer>
+    
+    <script>
+        // 关键字及其含义数据
+        const keywords = {
+            'input': '从用户获取输入',
+            'print': '打印输出信息',
+            'if': '条件判断',
+            'else': '否则（与if配合使用）',
+            'import': '导入模块',
+            'while': '循环执行代码',
+            'for': '遍历序列中的元素'
+        };
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initKeywords();
+            initQuiz1();
+            initQuiz2();
+        });
+        
+        // 显示指定区域
+        function showSection(sectionId) {
+            // 隐藏所有区域
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            // 显示选中区域
+            document.getElementById(sectionId).classList.add('active');
+        }
+        
+        // 初始化关键字展示
+        function initKeywords() {
+            const container = document.getElementById('keywordCards');
+            
+            for (const [keyword, meaning] of Object.entries(keywords)) {
+                const card = document.createElement('div');
+                card.className = 'keyword-card';
+                card.innerHTML = `
+                    <h3>${keyword}</h3>
+                    <div class="meaning">${meaning}</div>
+                `;
+                container.appendChild(card);
+            }
+        }
+        
+        // 初始化关键字选择题
+        let currentQuiz1 = null;
+        function initQuiz1() {
+            currentQuiz1 = generateQuiz1();
+            displayQuiz1(currentQuiz1);
+        }
+        
+        // 生成关键字选择题
+        function generateQuiz1() {
+            const keywordEntries = Object.entries(keywords);
+            const randomIndex = Math.floor(Math.random() * keywordEntries.length);
+            const [keyword, correctMeaning] = keywordEntries[randomIndex];
+            
+            // 生成错误选项
+            const meanings = Object.values(keywords);
+            const wrongMeanings = meanings.filter(m => m !== correctMeaning);
+            
+            // 随机选择3个错误选项
+            const shuffledWrong = wrongMeanings.sort(() => 0.5 - Math.random());
+            const selectedWrong = shuffledWrong.slice(0, 3);
+            
+            // 组合选项并随机排序
+            const options = [correctMeaning, ...selectedWrong];
+            const shuffledOptions = options.sort(() => 0.5 - Math.random());
+            
+            return {
+                keyword,
+                correctMeaning,
+                options: shuffledOptions
+            };
+        }
+        
+        // 显示关键字选择题
+        function displayQuiz1(quiz) {
+            document.getElementById('question1').textContent = `"${quiz.keyword}" 的含义是什么？`;
+            
+            const optionsContainer = document.getElementById('options1');
+            optionsContainer.innerHTML = '';
+            
+            quiz.options.forEach((option, index) => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'option';
+                optionElement.textContent = option;
+                optionElement.onclick = () => checkAnswer1(option, quiz.correctMeaning);
+                optionsContainer.appendChild(optionElement);
+            });
+            
+            document.getElementById('feedback1').textContent = '';
+            document.querySelector('#quiz1 .next-btn').style.display = 'none';
+        }
+        
+        // 检查关键字选择题答案
+        function checkAnswer1(selectedOption, correctOption) {
+            const options = document.querySelectorAll('#options1 .option');
+            const feedback = document.getElementById('feedback1');
+            const nextBtn = document.querySelector('#quiz1 .next-btn');
+            
+            options.forEach(option => {
+                if (option.textContent === correctOption) {
+                    option.classList.add('correct');
+                } else if (option.textContent === selectedOption) {
+                    option.classList.add('incorrect');
+                }
+                option.onclick = null; // 禁用点击
+            });
+            
+            if (selectedOption === correctOption) {
+                feedback.textContent = '回答正确！';
+                feedback.className = 'feedback correct';
+            } else {
+                feedback.textContent = '回答错误！正确答案是：' + correctOption;
+                feedback.className = 'feedback incorrect';
+            }
+            
+            nextBtn.style.display = 'block';
+        }
+        
+        // 下一题关键字选择题
+        function nextQuestion1() {
+            currentQuiz1 = generateQuiz1();
+            displayQuiz1(currentQuiz1);
+        }
+        
+        // 初始化含义选择题
+        let currentQuiz2 = null;
+        function initQuiz2() {
+            currentQuiz2 = generateQuiz2();
+            displayQuiz2(currentQuiz2);
+        }
+        
+        // 生成含义选择题
+        function generateQuiz2() {
+            const keywordEntries = Object.entries(keywords);
+            const randomIndex = Math.floor(Math.random() * keywordEntries.length);
+            const [correctKeyword, meaning] = keywordEntries[randomIndex];
+            
+            // 生成错误选项
+            const keywordList = Object.keys(keywords);
+            const wrongKeywords = keywordList.filter(k => k !== correctKeyword);
+            
+            // 随机选择3个错误选项
+            const shuffledWrong = wrongKeywords.sort(() => 0.5 - Math.random());
+            const selectedWrong = shuffledWrong.slice(0, 3);
+            
+            // 组合选项并随机排序
+            const options = [correctKeyword, ...selectedWrong];
+            const shuffledOptions = options.sort(() => 0.5 - Math.random());
+            
+            return {
+                meaning,
+                correctKeyword,
+                options: shuffledOptions
+            };
+        }
+        
+        // 显示含义选择题
+        function displayQuiz2(quiz) {
+            document.getElementById('question2').textContent = `"${quiz.meaning}" 对应的Python关键字是什么？`;
+            
+            const optionsContainer = document.getElementById('options2');
+            optionsContainer.innerHTML = '';
+            
+            quiz.options.forEach((option, index) => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'option';
+                optionElement.textContent = option;
+                optionElement.onclick = () => checkAnswer2(option, quiz.correctKeyword);
+                optionsContainer.appendChild(optionElement);
+            });
+            
+            document.getElementById('feedback2').textContent = '';
+            document.querySelector('#quiz2 .next-btn').style.display = 'none';
+        }
+        
+        // 检查含义选择题答案
+        function checkAnswer2(selectedOption, correctOption) {
+            const options = document.querySelectorAll('#options2 .option');
+            const feedback = document.getElementById('feedback2');
+            const nextBtn = document.querySelector('#quiz2 .next-btn');
+            
+            options.forEach(option => {
+                if (option.textContent === correctOption) {
+                    option.classList.add('correct');
+                } else if (option.textContent === selectedOption) {
+                    option.classList.add('incorrect');
+                }
+                option.onclick = null; // 禁用点击
+            });
+            
+            if (selectedOption === correctOption) {
+                feedback.textContent = '回答正确！';
+                feedback.className = 'feedback correct';
+            } else {
+                feedback.textContent = '回答错误！正确答案是：' + correctOption;
+                feedback.className = 'feedback incorrect';
+            }
+            
+            nextBtn.style.display = 'block';
+        }
+        
+        // 下一题含义选择题
+        function nextQuestion2() {
+            currentQuiz2 = generateQuiz2();
+            displayQuiz2(currentQuiz2);
+        }
+    </script>
+</body>
+</html>
