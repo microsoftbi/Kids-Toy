@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>逻辑运算训练</title>
+<style>
+  .footer-note {
+    margin-top: 24px;
+    font-size: 0.8rem;
+    color: #94a3b8;
+    letter-spacing: 0.02em;
+  }
+  :root {
+    --bg: #f0f4f8;
+    --card: #ffffff;
+    --primary: #4f46e5;
+    --success: #10b981;
+    --danger: #ef4444;
+    --text: #1e293b;
+    --sub: #64748b;
+    --border: #e2e8f0;
+    --radius: 16px;
+    --shadow: 0 4px 24px rgba(0,0,0,0.06);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+  .container {
+    width: 100%;
+    max-width: 624px;
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 42px 36px;
+    text-align: center;
+    min-height: 520px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  h1 {
+    font-size: 1.6rem;
+    margin-bottom: 6px;
+    color: var(--primary);
+  }
+  .subtitle {
+    font-size: 0.9rem;
+    color: var(--sub);
+    margin-bottom: 24px;
+  }
+
+  /* ── Config Screen ── */
+  .config-group {
+    margin-bottom: 18px;
+    text-align: left;
+  }
+  .config-group label {
+    display: block;
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 6px;
+    color: var(--text);
+  }
+  .config-group .options {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .config-group .opt-btn {
+    flex: 1;
+    min-width: 80px;
+    padding: 10px 14px;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    background: #fff;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+    color: var(--text);
+  }
+  .config-group .opt-btn:hover { border-color: var(--primary); }
+  .config-group .opt-btn.active {
+    border-color: var(--primary);
+    background: #eef2ff;
+    color: var(--primary);
+    font-weight: 600;
+  }
+  .config-group input[type="number"] {
+    width: 100%;
+    padding: 10px 14px;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .config-group input[type="number"]:focus { border-color: var(--primary); }
+  .btn-start {
+    margin-top: 8px;
+    width: 100%;
+    padding: 14px;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .btn-start:hover { opacity: 0.9; }
+
+  /* ── Quiz Screen ── */
+  .progress-bar-wrap {
+    height: 8px;
+    background: var(--border);
+    border-radius: 4px;
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: var(--primary);
+    border-radius: 4px;
+    transition: width 0.3s;
+  }
+  .progress-text {
+    font-size: 0.85rem;
+    color: var(--sub);
+    margin-bottom: 16px;
+  }
+  .expression {
+    font-size: 1.8rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    padding: 28px;
+    margin-bottom: 32px;
+    background: #f8fafc;
+    border-radius: 14px;
+    border: 2px dashed var(--border);
+    word-break: break-all;
+    color: var(--text);
+    font-family: "SF Mono", "Fira Code", "Consolas", monospace;
+  }
+  .answer-btns {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+  }
+  .answer-btn {
+    flex: 1;
+    max-width: 200px;
+    padding: 20px;
+    border: 2px solid var(--border);
+    border-radius: 14px;
+    font-size: 1.3rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+    background: #fff;
+    color: var(--text);
+  }
+  .answer-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+  .feedback {
+    margin-top: 20px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    min-height: 32px;
+  }
+  .feedback.correct { color: var(--success); }
+  .feedback.wrong { color: var(--danger); }
+
+  /* ── Result Screen ── */
+  .result-icon { font-size: 4rem; margin-bottom: 12px; }
+  .result-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 18px; }
+  .stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .stat-card {
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 16px 12px;
+  }
+  .stat-card .stat-num {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--primary);
+  }
+  .stat-card .stat-label {
+    font-size: 0.85rem;
+    color: var(--sub);
+    margin-top: 2px;
+  }
+  .review-list {
+    text-align: left;
+    max-height: 220px;
+    overflow-y: auto;
+    margin-bottom: 18px;
+  }
+  .review-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.9rem;
+    font-family: "SF Mono", "Fira Code", "Consolas", monospace;
+  }
+  .review-item .icon { font-size: 1rem; }
+  .review-item .icon.ok { color: var(--success); }
+  .review-item .icon.fail { color: var(--danger); }
+  .btn-again {
+    width: 100%;
+    padding: 14px;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .btn-again:hover { opacity: 0.9; }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- ═══════════ CONFIG SCREEN ═══════════ -->
+  <div id="screen-config">
+    <h1>🧠 逻辑运算训练</h1>
+    <p class="subtitle">训练 AND（与）和 OR（或）逻辑运算</p>
+
+    <div class="config-group">
+      <label>变量个数</label>
+      <div class="options" id="cfg-vars">
+        <button class="opt-btn active" data-val="2">2 个变量</button>
+        <button class="opt-btn" data-val="3">3 个变量</button>
+      </div>
+    </div>
+
+    <div class="config-group">
+      <label>题目数量</label>
+      <input type="number" id="cfg-count" value="10" min="1" max="50">
+    </div>
+
+    <div class="config-group">
+      <label>变量显示类型</label>
+      <div class="options" id="cfg-display">
+        <button class="opt-btn active" data-val="tf">TRUE / FALSE</button>
+        <button class="opt-btn" data-val="num">1 / 0</button>
+      </div>
+    </div>
+
+    <div class="config-group">
+      <label>运算符格式</label>
+      <div class="options" id="cfg-ops">
+        <button class="opt-btn active" data-val="sym">&amp;&amp; / ||</button>
+        <button class="opt-btn" data-val="word">and / or</button>
+      </div>
+    </div>
+
+    <button class="btn-start" onclick="startTraining()">🚀 开始训练</button>
+  </div>
+
+  <!-- ═══════════ QUIZ SCREEN ═══════════ -->
+  <div id="screen-quiz" class="hidden">
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progress-fill" style="width: 0%"></div>
+    </div>
+    <p class="progress-text" id="progress-text">第 1 / 10 题</p>
+
+    <div class="expression" id="expression"></div>
+
+    <div class="answer-btns">
+      <button class="answer-btn" id="btn-true" onclick="submitAnswer(true)">TRUE</button>
+      <button class="answer-btn" id="btn-false" onclick="submitAnswer(false)">FALSE</button>
+    </div>
+
+    <div class="feedback" id="feedback"></div>
+  </div>
+
+  <!-- ═══════════ RESULT SCREEN ═══════════ -->
+  <div id="screen-result" class="hidden">
+    <div class="result-icon" id="result-icon"></div>
+    <div class="result-title" id="result-title"></div>
+
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="stat-num" id="stat-correct">0</div>
+        <div class="stat-label">✅ 正确</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="stat-wrong">0</div>
+        <div class="stat-label">❌ 错误</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="stat-total">0</div>
+        <div class="stat-label">📝 总题数</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="stat-rate">0%</div>
+        <div class="stat-label">📊 正确率</div>
+      </div>
+    </div>
+
+    <div class="review-list" id="review-list"></div>
+
+    <button class="btn-again" onclick="backToConfig()">🔄 再来一次</button>
+  </div>
+
+<p class="footer-note">哥本哈士奇 with VSCode + Claude Code + DeepSeek V4</p>
+</div>
+
+<script>
+  // ── State ──
+  let cfgVarCount = 2;
+  let cfgCount = 10;
+  let cfgDisplay = 'tf';   // 'tf' | 'num'
+  let cfgOps = 'sym';      // 'sym' | 'word'
+  let questions = [];
+  let currentIdx = 0;
+  let correctCount = 0;
+  let wrongCount = 0;
+  let history = [];        // { expression, expected, userAnswer }
+
+  // ── Config screen: option buttons ──
+  document.querySelectorAll('.opt-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      this.parentElement.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+
+  function getOptVal(groupId) {
+    return document.querySelector(`#${groupId} .opt-btn.active`).dataset.val;
+  }
+
+  // ── Value helpers ──
+  function valStr(b) {
+    if (cfgDisplay === 'num') return b ? '1' : '0';
+    return b ? 'TRUE' : 'FALSE';
+  }
+  function opStr(op) {
+    if (cfgOps === 'word') return op === '&' ? 'and' : 'or';
+    return op === '&' ? '&&' : '||';
+  }
+  function trueStr() { return cfgDisplay === 'num' ? '1' : 'TRUE'; }
+  function falseStr() { return cfgDisplay === 'num' ? '0' : 'FALSE'; }
+
+  // ── Generate questions ──
+  function generateQuestions() {
+    const ops = ['&', '|'];
+    questions = [];
+    for (let i = 0; i < cfgCount; i++) {
+      let exp, expected;
+      if (cfgVarCount === 2) {
+        const a = Math.random() > 0.5;
+        const b = Math.random() > 0.5;
+        const op = ops[Math.floor(Math.random() * 2)];
+        // Calculate
+        if (op === '&') expected = a && b;
+        else expected = a || b;
+        exp = `${valStr(a)} ${opStr(op)} ${valStr(b)}`;
+      } else {
+        // 3 variables: a op1 b op2 c  (left-associative for simplicity)
+        const a = Math.random() > 0.5;
+        const b = Math.random() > 0.5;
+        const c = Math.random() > 0.5;
+        const op1 = ops[Math.floor(Math.random() * 2)];
+        const op2 = ops[Math.floor(Math.random() * 2)];
+        // Left-associative
+        let mid;
+        if (op1 === '&') mid = a && b; else mid = a || b;
+        if (op2 === '&') expected = mid && c; else expected = mid || c;
+        exp = `${valStr(a)} ${opStr(op1)} ${valStr(b)} ${opStr(op2)} ${valStr(c)}`;
+      }
+      questions.push({ expression: exp, expected });
+    }
+  }
+
+  // ── Start training ──
+  function startTraining() {
+    cfgVarCount = parseInt(getOptVal('cfg-vars'));
+    cfgCount = parseInt(document.getElementById('cfg-count').value) || 10;
+    cfgDisplay = getOptVal('cfg-display');
+    cfgOps = getOptVal('cfg-ops');
+    correctCount = 0; wrongCount = 0; currentIdx = 0; history = [];
+
+    generateQuestions();
+
+    document.getElementById('screen-config').classList.add('hidden');
+    document.getElementById('screen-quiz').classList.remove('hidden');
+    document.getElementById('screen-result').classList.add('hidden');
+
+    // Set button labels
+    document.getElementById('btn-true').textContent = trueStr();
+    document.getElementById('btn-false').textContent = falseStr();
+
+    showQuestion();
+  }
+
+  function showQuestion() {
+    if (currentIdx >= questions.length) {
+      showResult();
+      return;
+    }
+    const q = questions[currentIdx];
+    document.getElementById('expression').textContent = q.expression;
+    document.getElementById('progress-text').textContent =
+      `第 ${currentIdx + 1} / ${cfgCount} 题`;
+    document.getElementById('progress-fill').style.width =
+      `${((currentIdx) / cfgCount) * 100}%`;
+    document.getElementById('feedback').textContent = '';
+    document.getElementById('feedback').className = 'feedback';
+  }
+
+  function submitAnswer(userAnswer) {
+    const q = questions[currentIdx];
+    const isCorrect = userAnswer === q.expected;
+    const fb = document.getElementById('feedback');
+
+    if (isCorrect) {
+      correctCount++;
+      fb.textContent = '✅ 回答正确！';
+      fb.className = 'feedback correct';
+    } else {
+      wrongCount++;
+      fb.textContent = `❌ 回答错误！正确答案是 ${valStr(q.expected)}`;
+      fb.className = 'feedback wrong';
+    }
+
+    history.push({
+      expression: q.expression,
+      expected: q.expected,
+      userAnswer,
+      isCorrect
+    });
+
+    // Advance after short delay
+    setTimeout(() => {
+      currentIdx++;
+      document.getElementById('progress-fill').style.width =
+        `${(currentIdx / cfgCount) * 100}%`;
+      showQuestion();
+    }, 800);
+  }
+
+  // ── Result ──
+  function showResult() {
+    document.getElementById('screen-quiz').classList.add('hidden');
+    document.getElementById('screen-result').classList.remove('hidden');
+
+    const total = correctCount + wrongCount;
+    const rate = total > 0 ? Math.round((correctCount / total) * 100) : 0;
+
+    document.getElementById('stat-correct').textContent = correctCount;
+    document.getElementById('stat-wrong').textContent = wrongCount;
+    document.getElementById('stat-total').textContent = total;
+    document.getElementById('stat-rate').textContent = rate + '%';
+
+    // Emoji based on performance
+    let icon, title;
+    if (rate === 100) { icon = '🏆'; title = '完美！满分通关！'; }
+    else if (rate >= 80) { icon = '🌟'; title = '太棒了！继续加油！'; }
+    else if (rate >= 60) { icon = '💪'; title = '还不错，再接再厉！'; }
+    else { icon = '📚'; title = '多多练习，你能行！'; }
+    document.getElementById('result-icon').textContent = icon;
+    document.getElementById('result-title').textContent = title;
+
+    // Review list
+    const list = document.getElementById('review-list');
+    list.innerHTML = history.map((h, i) => `
+      <div class="review-item">
+        <span>${i + 1}. ${h.expression} = ${valStr(h.expected)}</span>
+        <span class="icon ${h.isCorrect ? 'ok' : 'fail'}">${h.isCorrect ? '✅' : '❌'}</span>
+      </div>
+    `).join('');
+  }
+
+  function backToConfig() {
+    document.getElementById('screen-result').classList.add('hidden');
+    document.getElementById('screen-config').classList.remove('hidden');
+  }
+</script>
+</body>
+</html>
